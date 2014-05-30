@@ -4,4 +4,4 @@
 
 (defn -main
   [& args]
-  (println (ff2/match-stats-from-topic "http://futisforum2.org/index.php?topic=165257.0"))))
+  (println (ff2/match-stats-from-topic "http://futisforum2.org/index.php?topic=165257.0")))
