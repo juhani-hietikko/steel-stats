@@ -1,12 +1,6 @@
 (ns import.scrape-ff2
   (:require [net.cgrand.enlive-html :as html]))
 
-(defn- fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
-
-(defn opening-post-in-topic [topic-url]
-  (first (html/select (fetch-url topic-url) [:div.post])))
-
 (defn- parse-table [html-tables n map-fn]
   (let [rows (map map-fn (html/select (nth html-tables n) [:tr]))]
     (reduce (fn [rows-map row] 
@@ -41,7 +35,7 @@
 (defn- parse-misc-row [html-row]
   (parse-row html-row [:interceptions :dribbles :ball-holdings :goal-attempts-and-assists]))
 
-(defn match-stats [html-post]
+(defn match-stats-from-post [html-post]
   (let [html-tables (html/select html-post [:table])
         minutes-and-passes (parse-table html-tables 0 parse-minutes-and-passes-row)
         attack-duels (parse-table html-tables 1 parse-attack-duels-row)
@@ -50,3 +44,12 @@
     (merge-with (fn [row-map-a row-map-b]
                   (merge row-map-a row-map-b)) 
                 minutes-and-passes attack-duels defence-duels misc)))
+
+(defn- fetch-url [url]
+  (html/html-resource (java.net.URL. url)))
+
+(defn- opening-post-in-topic [topic-url]
+  (first (html/select (fetch-url topic-url) [:div.post])))
+
+(defn match-stats-from-topic [topic-url]
+  (match-stats-from-post (opening-post-in-topic topic-url)))
