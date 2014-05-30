@@ -4,4 +4,4 @@
 
 (defn -main
   [& args]
-  (println (ff2/opening-post-in-topic "http://futisforum2.org/index.php?topic=165257.0")))
+  (println (ff2/minutes-and-passes (ff2/opening-post-in-topic "http://futisforum2.org/index.php?topic=165257.0"))))
