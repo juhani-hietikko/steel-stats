@@ -8,23 +8,22 @@
             {} 
             rows)))
 
-(defn- cell-text [cells n]
-  (html/text (nth cells n)))
-
 (defn- parse-row [html-row cols]
   (let [cells (html/select html-row [:td])
-        map-seed {:player-name (cell-text cells 0)}
-        col-indices (if (= 9 (count cells))
-                      [1 2 6]
-                      (for [i (range 1 (count cells))] i))]
+        filtered-cells (if (= 9 (count cells))
+                         ; A hack to handle the variation of the passes table 
+                         ; where there are extra columns for both halves.
+                         [(nth cells 1) (nth cells 2) (nth cells 6)]
+                         (rest cells))
+        map-seed {:player-name (html/text (first cells))}]
     (loop [remaining-cols cols
-           the-map map-seed
-           remaining-col-indices col-indices]
-      (if (or (empty? remaining-cols) (empty? remaining-col-indices))
+           remaining-cells filtered-cells
+           the-map map-seed]
+      (if (or (empty? remaining-cols) (empty? remaining-cells))
         the-map
-        (recur (rest remaining-cols) 
-               (conj the-map {(first remaining-cols) (cell-text cells (first remaining-col-indices))}) 
-               (rest remaining-col-indices))))))
+        (recur (rest remaining-cols)
+               (rest remaining-cells)
+               (conj the-map {(first remaining-cols) (html/text (first remaining-cells))}))))))
 
 (defn- parse-minutes-and-passes-row [html-row]
   (parse-row html-row [:minutes :all-passes :hard-passes]))
