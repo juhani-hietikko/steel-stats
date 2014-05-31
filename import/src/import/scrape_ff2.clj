@@ -13,15 +13,18 @@
 
 (defn- parse-row [html-row cols]
   (let [cells (html/select html-row [:td])
-        map-seed {:player-name (cell-text cells 0)}]
+        map-seed {:player-name (cell-text cells 0)}
+        col-indices (if (= 9 (count cells))
+                      [1 2 6]
+                      (for [i (range 1 (count cells))] i))]
     (loop [remaining-cols cols
            the-map map-seed
-           i 1]
-      (if (empty? remaining-cols)
+           remaining-col-indices col-indices]
+      (if (or (empty? remaining-cols) (empty? remaining-col-indices))
         the-map
         (recur (rest remaining-cols) 
-               (conj the-map {(first remaining-cols) (cell-text cells i)}) 
-               (inc i))))))
+               (conj the-map {(first remaining-cols) (cell-text cells (first remaining-col-indices))}) 
+               (rest remaining-col-indices))))))
 
 (defn- parse-minutes-and-passes-row [html-row]
   (parse-row html-row [:minutes :all-passes :hard-passes]))
