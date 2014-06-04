@@ -1,5 +1,6 @@
-(ns import.scrape-ff2
-  (:require [net.cgrand.enlive-html :as html]))
+(ns import.ff2-scrape
+  (:require [net.cgrand.enlive-html :as html]
+            [import.util :as util]))
 
 (defn- parse-table [html-tables n map-fn]
   (let [rows (map map-fn (html/select (nth html-tables n) [:tr]))]
@@ -7,15 +8,14 @@
               (let [player (:player-name row)]
                 (if (empty? player)
                   rows-map
-                  (conj rows-map {(:player-name row) row})))) 
-            {} 
-            rows)))
+                  (conj rows-map {player row})))) 
+            {} rows)))
 
 (defn- parse-row [html-row cols offset]
   (let [cells (html/select html-row [:td])
         filtered-cells (if (= 9 (count cells))
                          ; A hack to handle the variation of the passes table 
-                         ; where there are extra columns for both halves.
+                         ; where there are extra columns for each half.
                          [(nth cells 1) (nth cells 2) (nth cells 6)]
                          (rest cells))
         cells-with-offset (drop (* offset (count cols)) filtered-cells)
@@ -50,14 +50,8 @@
                   (merge row-map-a row-map-b)) 
                 minutes-and-passes attack-duels defence-duels misc)))
 
-(defn- fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
-
-(defn- opening-post-in-topic [topic-url]
-  (first (html/select (fetch-url topic-url) [:div.post])))
-
 (defn match-stats-from-topic 
   ([topic-url]
    (match-stats-from-topic topic-url 0))
   ([topic-url match-index]
-   (match-stats-from-post (opening-post-in-topic topic-url) match-index)))
+   (match-stats-from-post (util/opening-post-in-topic topic-url) match-index)))
