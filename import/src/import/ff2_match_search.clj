@@ -3,5 +3,10 @@
             [import.util :as util]))
 
 (defn pick-match-links-from [url]
-  (let [links-in-opening-post (html/select (util/opening-post-in-topic url) [:a])]
-    (println (map html/text links-in-opening-post))))
+  (let [links-in-opening-post (html/select (util/opening-post-in-topic url) [:a])
+        links-to-drop #{"http://futisforum2.org/index.php?topic=16119.0"
+                        "http://futisforum2.org/index.php?topic=41553.0"
+                        "http://futisforum2.org/index.php?topic=157398.0"}]
+    (->> (map #(get-in % [:attrs :href]) 
+              links-in-opening-post)
+         (filter (complement links-to-drop)))))

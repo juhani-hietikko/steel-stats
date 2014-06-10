@@ -6,6 +6,6 @@
 
 (defn -main
   [& args]
-  (matches/pick-match-links-from "http://futisforum2.org/index.php?topic=126157.0"))
+  (println (matches/pick-match-links-from "http://futisforum2.org/index.php?topic=126157.0")))
   ;(mg-import/save-to-mongo {})
   ;(println (ff2/match-stats-from-topic "http://futisforum2.org/index.php?topic=159803.0" 0)))
